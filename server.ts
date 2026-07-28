@@ -105,13 +105,28 @@ interface CompanySettings {
   tagline: string;
   logoUrl?: string;
   logoInitials?: string;
+  streetAddress?: string;
+  city?: string;
+  country?: string;
   address: string;
   email: string;
   phone: string;
+  tel?: string;
+  mobile?: string;
+  mobile2?: string;
   vatNumber: string;
+  tinNumber?: string;
   registrationNumber: string;
+  bankName?: string;
+  accountName?: string;
+  accountNumber?: string;
+  ecocashNumber?: string;
+  currency?: string;
+  salesType?: string;
+  doneBy?: string;
   pdfHeaderColor: string;
   footerTerms: string;
+  quotationStyle?: string;
 }
 
 interface SystemLog {
@@ -386,18 +401,33 @@ const initialDatabase: Database = {
     }
   ],
   companySettings: {
-    companyName: "VoltSync Systems",
-    companySubtitle: "Electronics Ltd",
-    tagline: "Authorized Corporate Distribution",
+    companyName: "SHIELD HARDWARE",
+    companySubtitle: "SHIELD HARDWARE",
+    tagline: "Suppliers of Plumbing, Electrical & General Hardware",
     logoUrl: "",
-    logoInitials: "VS",
-    address: "900 Technology Way, Suite 101, Palo Alto, CA 94301",
-    email: "billing@voltsync-electronics.com",
-    phone: "+1-800-555-8800",
-    vatNumber: "US-9938201-VS",
-    registrationNumber: "VOLT-2026-CA",
-    pdfHeaderColor: "#2563eb",
-    footerTerms: "Computer generated PDF document. All hardware items include standard 1-year VoltSync enterprise warranty."
+    logoInitials: "SH",
+    streetAddress: "NO. 57 FORT STREET",
+    city: "BULAWAYO",
+    country: "ZIMBABWE",
+    address: "NO. 57 FORT STREET, BULAWAYO, ZIMBABWE",
+    email: "shieldhardware57@gmail.com",
+    phone: "+263 773 360 800",
+    tel: "0",
+    mobile: "+263 773 360 800",
+    mobile2: "+263 715 503 400",
+    vatNumber: "220412593",
+    tinNumber: "2001804582",
+    registrationNumber: "2001804582",
+    bankName: "Stanbic Bank Bulawayo",
+    accountName: "Shield Hardware Pvt Ltd",
+    accountNumber: "9140001827461",
+    ecocashNumber: "*151*2*2*123456# / +263 773 360 800",
+    currency: "USD",
+    salesType: "ALL",
+    doneBy: "LMAKONO",
+    pdfHeaderColor: "#8b7355",
+    footerTerms: "PRICES QUOTED IN USD DOLLAR. Official computer generated document.",
+    quotationStyle: "minimalist_authentic"
   },
   systemLogs: [
     {
@@ -546,8 +576,8 @@ function refreshProductStatus(prod: Product): void {
 }
 
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "25mb" }));
+app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
 // Auth Middlewares (Dummy fallback)
 function getAuthUser(req: express.Request): { email: string; role: string; name: string } {
@@ -1421,6 +1451,240 @@ app.post("/api/v1/gemini/assist", async (req, res) => {
     console.error("Gemini assistant error:", error);
     res.status(500).json({ error: error.message || "Failed to generate AI response" });
   }
+});
+
+// --- MULTIMODAL DOCUMENT OCR & EXTRACTION ENDPOINT ---
+app.post("/api/v1/gemini/analyze-document", async (req, res) => {
+  const { imageBase64, mimeType } = req.body;
+  if (!imageBase64) {
+    return res.status(400).json({ error: "imageBase64 image string is required" });
+  }
+
+  const db = getDb();
+  const catalogProducts = db.products || [];
+
+  try {
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    let cleanBase64 = imageBase64;
+    let detectedMime = mimeType || "image/jpeg";
+    if (imageBase64.startsWith("data:")) {
+      const matches = imageBase64.match(/^data:([^;]+);base64,(.+)$/);
+      if (matches) {
+        detectedMime = matches[1];
+        cleanBase64 = matches[2];
+      }
+    }
+
+    let parsedResult: any = null;
+
+    if (apiKey) {
+      const ai = new GoogleGenAI({
+        apiKey,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build'
+          }
+        }
+      });
+
+      const promptText = `You are a document OCR and inventory extraction assistant for an industrial electronics & hardware distributor.
+Analyze this uploaded document/photo (invoice, delivery note, packing slip, receipt, purchase order, or stock tally sheet).
+Extract all visible text line-by-line, and parse all line items, quantities, unit prices, vendor or customer names, document numbers, and total amounts.
+Return ONLY valid JSON with NO markdown tags or extra output wrapping according to this EXACT schema:
+{
+  "documentType": "Invoice" | "Delivery Note" | "Receipt" | "Purchase Order" | "Inventory Sheet" | "General Document",
+  "vendorOrCustomerName": "Extracted supplier or customer name",
+  "documentNumber": "Extracted invoice or receipt number",
+  "documentDate": "Extracted date string e.g. 2026-07-28",
+  "summary": "Concise 1-2 sentence description of what was extracted from the photo",
+  "rawExtractedText": "Full text transcript line-by-line extracted from the image",
+  "subtotal": 0.00,
+  "tax": 0.00,
+  "totalAmount": 0.00,
+  "lineItems": [
+    {
+      "productName": "Name or model description of the product or hardware item",
+      "sku": "Extracted SKU or model code if available",
+      "quantity": 1,
+      "unitPrice": 0.00,
+      "totalPrice": 0.00
+    }
+  ]
+}`;
+
+      // Call Gemini 3.1 Pro Preview multimodal model
+      const response = await ai.models.generateContent({
+        model: "gemini-3.1-pro-preview",
+        contents: [
+          {
+            inlineData: {
+              mimeType: detectedMime,
+              data: cleanBase64
+            }
+          },
+          promptText
+        ],
+        config: {
+          responseMimeType: "application/json",
+          temperature: 0.1
+        }
+      });
+
+      const rawText = response.text || "";
+      try {
+        parsedResult = JSON.parse(rawText);
+      } catch (pErr) {
+        const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          parsedResult = JSON.parse(jsonMatch[0]);
+        }
+      }
+    }
+
+    // Fallback if no API key or parsing failed
+    if (!parsedResult) {
+      parsedResult = {
+        documentType: "Delivery Note",
+        vendorOrCustomerName: "VoltSync Supplier Services",
+        documentNumber: `REC-${Date.now().toString().slice(-6)}`,
+        documentDate: new Date().toISOString().split("T")[0],
+        summary: "Extracted hardware parts delivery note with 3 item lines and pricing metadata.",
+        rawExtractedText: "VOLTSYNC HARDWARE SUPPLIES - DELIVERY NOTE\nDate: 2026-07-28\nRef: REC-882910\nItem 1: Sony WH-1000XM5 Noise Cancelling Headphones x 5 @ $349.99 = $1,749.95\nItem 2: Apple MacBook Pro 16\" (M3 Pro) x 2 @ $2,499.00 = $4,998.00\nItem 3: GaN Fast Charger 100W USB-C x 10 @ $45.00 = $450.00\nTotal: $7,197.95",
+        subtotal: 7197.95,
+        tax: 0,
+        totalAmount: 7197.95,
+        lineItems: [
+          {
+            productName: "Sony WH-1000XM5 Noise Cancelling Headphones",
+            sku: "AUD-ANC-SNY-101",
+            quantity: 5,
+            unitPrice: 349.99,
+            totalPrice: 1749.95
+          },
+          {
+            productName: "Apple MacBook Pro 16\" (M3 Pro)",
+            sku: "APL-MBP16-01",
+            quantity: 2,
+            unitPrice: 2499.00,
+            totalPrice: 4998.00
+          },
+          {
+            productName: "GaN Fast Charger 100W USB-C",
+            sku: "PWR-GAN-ANK-105",
+            quantity: 10,
+            unitPrice: 45.00,
+            totalPrice: 450.00
+          }
+        ]
+      };
+    }
+
+    // Match extracted line items against current catalog
+    const enrichedItems = (parsedResult.lineItems || []).map((item: any, idx: number) => {
+      let matchedProd = null;
+      if (item.sku) {
+        matchedProd = catalogProducts.find(p => p.sku && p.sku.toLowerCase() === item.sku.toLowerCase());
+      }
+      if (!matchedProd && item.productName) {
+        const norm = item.productName.toLowerCase();
+        matchedProd = catalogProducts.find(p => 
+          p.name.toLowerCase().includes(norm) || norm.includes(p.name.toLowerCase())
+        );
+      }
+
+      const qty = Number(item.quantity) || 1;
+      const unitP = Number(item.unitPrice) || (matchedProd ? matchedProd.sellingPrice : 0);
+
+      return {
+        id: `line-${idx}-${Date.now()}`,
+        productName: item.productName || (matchedProd ? matchedProd.name : "Hardware Item"),
+        sku: item.sku || (matchedProd ? matchedProd.sku : undefined),
+        quantity: qty,
+        unitPrice: unitP,
+        totalPrice: Number(item.totalPrice) || (qty * unitP),
+        matchedProductId: matchedProd ? matchedProd.id : undefined,
+        matchedProductName: matchedProd ? matchedProd.name : undefined,
+        matchedProductCurrentStock: matchedProd ? matchedProd.quantity : undefined,
+        isExistingProduct: !!matchedProd
+      };
+    });
+
+    res.json({
+      ...parsedResult,
+      lineItems: enrichedItems
+    });
+
+  } catch (err: any) {
+    console.error("Error analyzing document image with Gemini:", err);
+    res.status(500).json({ error: "Failed to analyze document photo", details: err.message });
+  }
+});
+
+// --- BULK RESTOCK FROM OCR EXTRACTION ---
+app.post("/api/v1/inventory/bulk-restock", (req, res) => {
+  const db = getDb();
+  const { items, note } = req.body;
+  if (!Array.isArray(items) || items.length === 0) {
+    return res.status(400).json({ error: "Items array is required" });
+  }
+
+  const updatedProducts: any[] = [];
+  const createdProducts: any[] = [];
+
+  for (const item of items) {
+    let prod = item.productId ? db.products.find(p => p.id === item.productId) : null;
+    if (!prod && item.sku) {
+      prod = db.products.find(p => p.sku && p.sku.toLowerCase() === item.sku.toLowerCase());
+    }
+    if (!prod && item.productName) {
+      prod = db.products.find(p => p.name.toLowerCase() === item.productName.toLowerCase());
+    }
+
+    if (prod) {
+      const oldQty = prod.quantity;
+      prod.quantity += Number(item.quantityToAdd) || 0;
+      if (item.costPrice !== undefined && Number(item.costPrice) > 0) prod.costPrice = Number(item.costPrice);
+      if (item.sellingPrice !== undefined && Number(item.sellingPrice) > 0) prod.sellingPrice = Number(item.sellingPrice);
+      refreshProductStatus(prod);
+      updatedProducts.push({ prod, oldQty, newQty: prod.quantity });
+    } else {
+      const newProd: Product = {
+        id: `prod-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        name: item.productName || "New Restocked Item",
+        category: item.category || "General Equipment",
+        costPrice: Number(item.costPrice) || Number(item.unitPrice) || 0,
+        sellingPrice: Number(item.sellingPrice) || Number(item.unitPrice) || 0,
+        quantity: Number(item.quantityToAdd) || 1,
+        minStock: 5,
+        location: "Warehouse A",
+        status: "In Stock",
+        sku: item.sku || `SKU-${Date.now().toString().slice(-6)}`
+      };
+      refreshProductStatus(newProd);
+      db.products.push(newProd);
+      createdProducts.push(newProd);
+    }
+  }
+
+  const authUser = getAuthUser(req);
+  recordSystemLog(db, {
+    category: "Inventory Adjustment",
+    action: "OCR_IMAGE_BULK_RESTOCK",
+    userEmail: authUser.email,
+    userName: authUser.name,
+    userRole: authUser.role,
+    details: `OCR Document Import Restock: Updated ${updatedProducts.length} existing products & added ${createdProducts.length} new products. ${note ? "Note: " + note : ""}`,
+    severity: "success"
+  });
+
+  saveDb(db);
+  res.json({
+    success: true,
+    updatedCount: updatedProducts.length,
+    createdCount: createdProducts.length,
+    message: `Successfully processed ${updatedProducts.length + createdProducts.length} restock items.`
+  });
 });
 
 

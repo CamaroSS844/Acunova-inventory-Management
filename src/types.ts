@@ -1,3 +1,29 @@
+export interface ExtractedLineItem {
+  id: string;
+  productName: string;
+  sku?: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+  matchedProductId?: string;
+  matchedProductName?: string;
+  matchedProductCurrentStock?: number;
+  isExistingProduct: boolean;
+}
+
+export interface DocumentAnalysisResult {
+  documentType: "Invoice" | "Delivery Note" | "Receipt" | "Purchase Order" | "Inventory Sheet" | "General Document";
+  vendorOrCustomerName?: string;
+  documentNumber?: string;
+  documentDate?: string;
+  rawExtractedText: string;
+  summary: string;
+  lineItems: ExtractedLineItem[];
+  subtotal?: number;
+  tax?: number;
+  totalAmount?: number;
+}
+
 export interface AuthUser {
   id: string;
   name: string;
@@ -285,13 +311,28 @@ export interface CompanySettings {
   tagline: string;
   logoUrl?: string;
   logoInitials?: string;
+  streetAddress?: string;
+  city?: string;
+  country?: string;
   address: string;
   email: string;
   phone: string;
+  tel?: string;
+  mobile?: string;
+  mobile2?: string;
   vatNumber: string;
+  tinNumber?: string;
   registrationNumber: string;
+  bankName?: string;
+  accountName?: string;
+  accountNumber?: string;
+  ecocashNumber?: string;
+  currency?: string;
+  salesType?: string;
+  doneBy?: string;
   pdfHeaderColor: string;
   footerTerms: string;
+  quotationStyle?: "minimalist_authentic" | "corporate_modern";
 }
 
 export interface ProductResponse {

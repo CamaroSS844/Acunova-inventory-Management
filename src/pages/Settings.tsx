@@ -41,35 +41,65 @@ export const Settings: React.FC = () => {
   });
 
   const [formState, setFormState] = useState<CompanySettings>({
-    companyName: "VoltSync Systems",
-    companySubtitle: "Electronics Ltd",
-    tagline: "Authorized Corporate Distribution",
+    companyName: "SHIELD HARDWARE",
+    companySubtitle: "SHIELD HARDWARE",
+    tagline: "Suppliers of Plumbing, Electrical & General Hardware",
     logoUrl: "",
-    logoInitials: "VS",
-    address: "900 Technology Way, Suite 101, Palo Alto, CA 94301",
-    email: "billing@voltsync-electronics.com",
-    phone: "+1-800-555-8800",
-    vatNumber: "US-9938201-VS",
-    registrationNumber: "VOLT-2026-CA",
-    pdfHeaderColor: "#2563eb",
-    footerTerms: "Computer generated PDF document. All hardware items include standard 1-year VoltSync enterprise warranty."
+    logoInitials: "SH",
+    streetAddress: "NO. 57 FORT STREET",
+    city: "BULAWAYO",
+    country: "ZIMBABWE",
+    address: "NO. 57 FORT STREET, BULAWAYO, ZIMBABWE",
+    email: "shieldhardware57@gmail.com",
+    phone: "+263 773 360 800",
+    tel: "0",
+    mobile: "+263 773 360 800",
+    mobile2: "+263 715 503 400",
+    vatNumber: "220412593",
+    tinNumber: "2001804582",
+    registrationNumber: "2001804582",
+    bankName: "Stanbic Bank Bulawayo",
+    accountName: "Shield Hardware Pvt Ltd",
+    accountNumber: "9140001827461",
+    ecocashNumber: "*151*2*2*123456# / +263 773 360 800",
+    currency: "USD",
+    salesType: "ALL",
+    doneBy: "LMAKONO",
+    pdfHeaderColor: "#8b7355",
+    footerTerms: "PRICES QUOTED IN USD DOLLAR. Official computer generated document.",
+    quotationStyle: "minimalist_authentic"
   });
 
   useEffect(() => {
     if (serverSettings) {
       setFormState({
-        companyName: serverSettings.companyName || "VoltSync Systems",
-        companySubtitle: serverSettings.companySubtitle || "Electronics Ltd",
-        tagline: serverSettings.tagline || "Authorized Corporate Distribution",
+        companyName: serverSettings.companyName || "SHIELD HARDWARE",
+        companySubtitle: serverSettings.companySubtitle || "SHIELD HARDWARE",
+        tagline: serverSettings.tagline || "Suppliers of Plumbing, Electrical & General Hardware",
         logoUrl: serverSettings.logoUrl || "",
-        logoInitials: serverSettings.logoInitials || "VS",
-        address: serverSettings.address || "900 Technology Way, Suite 101, Palo Alto, CA 94301",
-        email: serverSettings.email || "billing@voltsync-electronics.com",
-        phone: serverSettings.phone || "+1-800-555-8800",
-        vatNumber: serverSettings.vatNumber || "US-9938201-VS",
-        registrationNumber: serverSettings.registrationNumber || "VOLT-2026-CA",
-        pdfHeaderColor: serverSettings.pdfHeaderColor || "#2563eb",
-        footerTerms: serverSettings.footerTerms || "Computer generated PDF document. All hardware items include standard 1-year VoltSync enterprise warranty."
+        logoInitials: serverSettings.logoInitials || "SH",
+        streetAddress: serverSettings.streetAddress || "NO. 57 FORT STREET",
+        city: serverSettings.city || "BULAWAYO",
+        country: serverSettings.country || "ZIMBABWE",
+        address: serverSettings.address || "NO. 57 FORT STREET, BULAWAYO, ZIMBABWE",
+        email: serverSettings.email || "shieldhardware57@gmail.com",
+        phone: serverSettings.phone || "+263 773 360 800",
+        tel: serverSettings.tel || "0",
+        mobile: serverSettings.mobile || "+263 773 360 800",
+        mobile2: serverSettings.mobile2 || "+263 715 503 400",
+        vatNumber: serverSettings.vatNumber || "220412593",
+        tinNumber: serverSettings.tinNumber || "2001804582",
+        registrationNumber: serverSettings.registrationNumber || "2001804582",
+        bankName: serverSettings.bankName || "Stanbic Bank Bulawayo",
+        accountName: serverSettings.accountName || "Shield Hardware Pvt Ltd",
+        accountNumber: serverSettings.accountNumber || "9140001827461",
+        ecocashNumber: serverSettings.ecocashNumber || "*151*2*2*123456# / +263 773 360 800",
+        currency: serverSettings.currency || "USD",
+        salesType: serverSettings.salesType || "ALL",
+        doneBy: serverSettings.doneBy || "LMAKONO",
+        pdfHeaderColor: serverSettings.pdfHeaderColor || "#8b7355",
+        footerTerms: serverSettings.footerTerms || "PRICES QUOTED IN USD DOLLAR. Official computer generated document.",
+        quotationStyle: serverSettings.quotationStyle || "minimalist_authentic"
       });
     }
   }, [serverSettings]);
@@ -290,7 +320,7 @@ export const Settings: React.FC = () => {
             <div className="space-y-4">
               <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
                 <Building size={16} className="text-blue-600" />
-                <h3 className="font-bold text-xs uppercase tracking-wider text-slate-900">2. Company Legal Title & Tagline</h3>
+                <h3 className="font-bold text-xs uppercase tracking-wider text-slate-900">2. Company Name & Business Tagline</h3>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -302,123 +332,294 @@ export const Settings: React.FC = () => {
                     value={formState.companyName}
                     onChange={handleInputChange}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                    placeholder="e.g. VoltSync Systems"
+                    placeholder="e.g. SHIELD HARDWARE"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Subtitle / Entity Designation</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Header Subtitle Line</label>
                   <input
                     type="text"
                     name="companySubtitle"
                     value={formState.companySubtitle}
                     onChange={handleInputChange}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                    placeholder="e.g. Electronics Ltd"
+                    placeholder="e.g. SHIELD HARDWARE"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Header Subtitle / Tagline</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Company Slogan / Tagline</label>
                   <input
                     type="text"
                     name="tagline"
                     value={formState.tagline}
                     onChange={handleInputChange}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                    placeholder="e.g. Authorized Corporate Distribution"
+                    placeholder="e.g. Suppliers of Plumbing, Electrical & General Hardware"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Address, Phone, Email & Tax Registration */}
+            {/* Address & Physical Location */}
             <div className="space-y-4">
               <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-                <FileCheck size={16} className="text-blue-600" />
-                <h3 className="font-bold text-xs uppercase tracking-wider text-slate-900">3. Contact Details & Tax Registration Info</h3>
+                <Building2 size={16} className="text-blue-600" />
+                <h3 className="font-bold text-xs uppercase tracking-wider text-slate-900">3. Physical Location & Address</h3>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Official Corporate Address</label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Street Address / Building</label>
                   <input
                     type="text"
-                    name="address"
-                    value={formState.address}
+                    name="streetAddress"
+                    value={formState.streetAddress || ""}
                     onChange={handleInputChange}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                    placeholder="900 Technology Way, Suite 101, Palo Alto, CA 94301"
+                    placeholder="e.g. NO. 57 FORT STREET"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Billing / Support Email</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">City / Town</label>
+                  <input
+                    type="text"
+                    name="city"
+                    value={formState.city || ""}
+                    onChange={handleInputChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                    placeholder="e.g. BULAWAYO"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Country</label>
+                  <input
+                    type="text"
+                    name="country"
+                    value={formState.country || ""}
+                    onChange={handleInputChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                    placeholder="e.g. ZIMBABWE"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Official Contact Numbers & Email */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+                <Phone size={16} className="text-blue-600" />
+                <h3 className="font-bold text-xs uppercase tracking-wider text-slate-900">4. Contact Info (Tel, Mobile & Email)</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Tel (Landline)</label>
+                  <input
+                    type="text"
+                    name="tel"
+                    value={formState.tel || ""}
+                    onChange={handleInputChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                    placeholder="e.g. 0"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Mobile 1 (Primary)</label>
+                  <input
+                    type="text"
+                    name="mobile"
+                    value={formState.mobile || ""}
+                    onChange={handleInputChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                    placeholder="e.g. +263 773 360 800"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Mobile 2 (Secondary)</label>
+                  <input
+                    type="text"
+                    name="mobile2"
+                    value={formState.mobile2 || ""}
+                    onChange={handleInputChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                    placeholder="e.g. +263 715 503 400"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Official Email</label>
                   <input
                     type="email"
                     name="email"
                     value={formState.email}
                     onChange={handleInputChange}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                    placeholder="billing@voltsync-electronics.com"
+                    placeholder="shieldhardware57@gmail.com"
                   />
                 </div>
+              </div>
+            </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Telephone / Hotline</label>
-                  <input
-                    type="text"
-                    name="phone"
-                    value={formState.phone}
-                    onChange={handleInputChange}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                    placeholder="+1-800-555-8800"
-                  />
-                </div>
+            {/* Tax IDs & Registration */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+                <FileCheck size={16} className="text-blue-600" />
+                <h3 className="font-bold text-xs uppercase tracking-wider text-slate-900">5. Tax & Commercial Registration IDs</h3>
+              </div>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">VAT / Tax Registration Number</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">VAT No</label>
                   <input
                     type="text"
                     name="vatNumber"
                     value={formState.vatNumber}
                     onChange={handleInputChange}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                    placeholder="US-9938201-VS"
+                    placeholder="220412593"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Commercial Registration Code</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">TIN No / Tax ID</label>
                   <input
                     type="text"
-                    name="registrationNumber"
-                    value={formState.registrationNumber}
-                    onChange={handleInputChange}
+                    name="tinNumber"
+                    value={formState.tinNumber || formState.registrationNumber || ""}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setFormState(prev => ({ ...prev, tinNumber: val, registrationNumber: val }));
+                    }}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                    placeholder="VOLT-2026-CA"
+                    placeholder="2001804582"
                   />
                 </div>
               </div>
             </div>
 
-            {/* PDF Footer Legal Note / Guarantee Terms */}
+            {/* Payment & Banking Information (Bank Account / EcoCash / Currency) */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+                <Building size={16} className="text-amber-600" />
+                <h3 className="font-bold text-xs uppercase tracking-wider text-slate-900">6. Payment Details (Bank Account, EcoCash & Currency)</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Bank Name & Branch</label>
+                  <input
+                    type="text"
+                    name="bankName"
+                    value={formState.bankName || ""}
+                    onChange={handleInputChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                    placeholder="e.g. Stanbic Bank Bulawayo"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Account Name</label>
+                  <input
+                    type="text"
+                    name="accountName"
+                    value={formState.accountName || ""}
+                    onChange={handleInputChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                    placeholder="e.g. Shield Hardware Pvt Ltd"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Bank Account Number</label>
+                  <input
+                    type="text"
+                    name="accountNumber"
+                    value={formState.accountNumber || ""}
+                    onChange={handleInputChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                    placeholder="e.g. 9140001827461"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">EcoCash Merchant Code / Number</label>
+                  <input
+                    type="text"
+                    name="ecocashNumber"
+                    value={formState.ecocashNumber || ""}
+                    onChange={handleInputChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                    placeholder="e.g. *151*2*2*123456# / +263 773 360 800"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Default Quotation Currency</label>
+                  <select
+                    name="currency"
+                    value={formState.currency || "USD"}
+                    onChange={handleInputChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                  >
+                    <option value="USD">USD (US Dollar)</option>
+                    <option value="ZiG">ZiG (Zimbabwe Gold)</option>
+                    <option value="ZWL">ZWL (Zimbabwe Dollar)</option>
+                    <option value="ZAR">ZAR (South African Rand)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Sales Person / Done By</label>
+                  <input
+                    type="text"
+                    name="doneBy"
+                    value={formState.doneBy || ""}
+                    onChange={handleInputChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                    placeholder="e.g. LMAKONO"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Quotation Style & Terms */}
             <div className="space-y-4">
               <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
                 <Sparkles size={16} className="text-blue-600" />
-                <h3 className="font-bold text-xs uppercase tracking-wider text-slate-900">4. PDF Footer Terms & Warranty Notice</h3>
+                <h3 className="font-bold text-xs uppercase tracking-wider text-slate-900">7. Quotation Layout Format & Footer Note</h3>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Footer Legal Disclaimer & Terms</label>
-                <textarea
-                  name="footerTerms"
-                  rows={2}
-                  value={formState.footerTerms}
-                  onChange={handleInputChange}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-medium text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                  placeholder="Computer generated PDF document. All hardware items include standard 1-year VoltSync enterprise warranty."
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Document Layout Style</label>
+                  <select
+                    name="quotationStyle"
+                    value={formState.quotationStyle || "minimalist_authentic"}
+                    onChange={handleInputChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                  >
+                    <option value="minimalist_authentic">Minimalist Authentic (Matches Official Reference Invoice)</option>
+                    <option value="corporate_modern">Modern Corporate Layout</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Footer Note / Disclaimer</label>
+                  <input
+                    type="text"
+                    name="footerTerms"
+                    value={formState.footerTerms}
+                    onChange={handleInputChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                    placeholder="PRICES QUOTED IN USD DOLLAR"
+                  />
+                </div>
               </div>
             </div>
 
@@ -427,76 +628,166 @@ export const Settings: React.FC = () => {
               <div className="flex items-center justify-between pb-3 border-b border-slate-200">
                 <div className="flex items-center gap-2 text-slate-900 font-extrabold text-xs uppercase tracking-wider">
                   <Eye size={16} className="text-blue-600" />
-                  <span>Real-Time PDF Header Live Preview</span>
+                  <span>Real-Time Quotation Live Preview</span>
                 </div>
-                <span className="text-[11px] font-mono font-bold text-slate-400">Sample PDF Render</span>
+                <span className="text-[11px] font-mono font-bold text-slate-500">Document Layout Preview</span>
               </div>
 
-              <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-4 shadow-xs">
-                <div className="flex flex-col sm:flex-row justify-between items-start gap-4 pb-4 border-b-2 border-slate-900">
+              {/* Minimalist Authentic Template Box */}
+              <div className="bg-white rounded-lg border border-slate-300 p-6 space-y-4 shadow-sm font-sans text-xs text-slate-900">
+                
+                {/* Top Title & Underline */}
+                <div className="text-center pb-1">
+                  <h3 className="font-sans font-bold text-base text-slate-900 uppercase tracking-wide">
+                    {formState.companyName || "SHIELD HARDWARE"}
+                  </h3>
+                  <div className="w-full border-b border-slate-900 mt-1" />
+                  <p className="font-sans text-[11px] font-bold text-slate-800 uppercase tracking-tight mt-0.5">
+                    {formState.companySubtitle || formState.companyName || "SHIELD HARDWARE"}
+                  </p>
+                </div>
+
+                {/* Header Grid: Logo & Address Left | Contact & Tax Right */}
+                <div className="grid grid-cols-2 gap-4 text-[11px] font-mono pt-1">
+                  
+                  {/* Left Column: Logo + Street Address + Email */}
                   <div className="space-y-2">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       {formState.logoUrl ? (
                         <img
                           src={formState.logoUrl}
-                          alt="Company Logo Preview"
-                          className="max-h-10 max-w-[150px] object-contain rounded-lg border border-slate-200 p-1"
+                          alt="Logo Preview"
+                          className="h-10 object-contain"
                         />
                       ) : (
-                        <span
-                          style={{ backgroundColor: formState.pdfHeaderColor || "#2563eb" }}
-                          className="p-2 rounded-xl text-white font-black text-sm leading-none shadow-xs font-mono"
-                        >
-                          {formState.logoInitials || "VS"}
-                        </span>
+                        <div className="px-2.5 py-1 bg-blue-900 text-white font-bold rounded-xs font-sans text-xs">
+                          {formState.logoInitials || "SH"}
+                        </div>
                       )}
-                      <div>
-                        <h4 className="font-black text-xl text-slate-950 tracking-tight leading-none">
-                          {formState.companyName || "Company Name"} {formState.companySubtitle && <span className="font-light text-slate-500 text-xs">{formState.companySubtitle}</span>}
-                        </h4>
-                        {formState.tagline && (
-                          <span 
-                            style={{ color: formState.pdfHeaderColor || "#2563eb" }}
-                            className="text-[10px] font-mono tracking-widest uppercase font-bold block mt-0.5"
-                          >
-                            {formState.tagline}
-                          </span>
-                        )}
+                    </div>
+                    <div className="space-y-0.5 text-slate-800 uppercase leading-snug">
+                      <p>{formState.streetAddress || "NO. 57 FORT STREET"}</p>
+                      <p>{formState.city || "BULAWAYO"}</p>
+                      <p>{formState.country || "ZIMBABWE"}</p>
+                      <p className="normal-case pt-1"><span className="font-bold">Email:</span> {formState.email || "shieldhardware57@gmail.com"}</p>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Tel, Mobile, VAT, TIN */}
+                  <div className="text-right space-y-1 text-slate-800">
+                    <div className="flex justify-end gap-2">
+                      <span className="text-slate-500 font-bold">Tel:</span>
+                      <span>{formState.tel || "0"}</span>
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <span className="text-slate-500 font-bold">Mobile:</span>
+                      <div className="text-right">
+                        <p>{formState.mobile || "+263 773 360 800"}</p>
+                        {formState.mobile2 && <p>{formState.mobile2}</p>}
+                      </div>
+                    </div>
+                    <div className="flex justify-end gap-2 pt-1">
+                      <span className="text-slate-500 font-bold">VAT No:</span>
+                      <span>{formState.vatNumber || "220412593"}</span>
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <span className="text-slate-500 font-bold">TIN No:</span>
+                      <span>{formState.tinNumber || formState.registrationNumber || "2001804582"}</span>
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Tagline / Slogan Subheader */}
+                <div className="text-center pt-1">
+                  <p className="text-[11px] font-sans font-semibold text-slate-800 italic border-t border-b border-slate-300 py-1">
+                    {formState.tagline || "Suppliers of Plumbing, Electrical & General Hardware"}
+                  </p>
+                </div>
+
+                {/* Centered Document Type */}
+                <div className="text-center pt-2">
+                  <h2 className="text-sm font-bold font-sans tracking-widest uppercase text-slate-900">QUOTATION</h2>
+                </div>
+
+                {/* Two side-by-side Rounded Boxes */}
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  {/* Customer Box */}
+                  <div className="border border-amber-800/60 rounded-xl p-3 space-y-1 font-mono text-[10px] text-slate-800">
+                    <p><span className="text-slate-500 font-bold">Customer:</span> 1000</p>
+                    <p className="font-bold text-slate-950">MR T. SIALUMBA</p>
+                    <p><span className="text-slate-500 font-bold">Mobile:</span> 077 493 8581</p>
+                    <p><span className="text-slate-500 font-bold">VAT No:</span> -</p>
+                  </div>
+
+                  {/* Quotation Metadata Box */}
+                  <div className="space-y-2">
+                    <div className="border border-amber-800/60 rounded-xl p-3 space-y-1 font-mono text-[10px] text-slate-800">
+                      <div className="flex justify-between">
+                        <span className="text-slate-500 font-bold">Quotation No:</span>
+                        <span className="font-bold text-slate-950">SHW6342</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500 font-bold">Quotation Date:</span>
+                        <span>25/06/2026</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500 font-bold">Sales Type:</span>
+                        <span>{formState.salesType || "ALL"}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500 font-bold">Done By:</span>
+                        <span>{formState.doneBy || "LMAKONO"}</span>
                       </div>
                     </div>
 
-                    <div className="text-[11px] text-slate-500 space-y-0.5 font-sans">
-                      {formState.address && <p className="flex items-center gap-1"><Building2 size={11} className="text-slate-400" /> {formState.address}</p>}
-                      {(formState.email || formState.phone) && (
-                        <p className="flex items-center gap-1.5 flex-wrap">
-                          {formState.email && <span className="flex items-center gap-1"><Mail size={11} className="text-slate-400" /> {formState.email}</span>}
-                          {formState.email && formState.phone && <span className="text-slate-300">|</span>}
-                          {formState.phone && <span className="flex items-center gap-1"><Phone size={11} className="text-slate-400" /> {formState.phone}</span>}
-                        </p>
-                      )}
-                      {(formState.vatNumber || formState.registrationNumber) && (
-                        <p className="font-mono text-[10px] text-slate-400">
-                          {formState.vatNumber && <span>VAT: {formState.vatNumber}</span>}
-                          {formState.vatNumber && formState.registrationNumber && <span> | </span>}
-                          {formState.registrationNumber && <span>Reg: {formState.registrationNumber}</span>}
-                        </p>
-                      )}
+                    <div className="border border-amber-800/60 rounded-lg p-1.5 px-3 flex justify-between font-mono text-[10px] font-bold text-slate-900">
+                      <span>Currency:</span>
+                      <span>{formState.currency || "USD"}</span>
                     </div>
                   </div>
-
-                  <div className="text-right font-mono space-y-1">
-                    <span className="text-[9px] uppercase font-bold text-slate-400 block">OFFICIAL QUOTATION</span>
-                    <span className="text-lg font-black text-slate-900">QT-2026-001</span>
-                    <span className="text-[10px] text-slate-400 block">Issued: 2026-07-27</span>
-                  </div>
                 </div>
 
-                <div className="pt-2 text-[10px] text-slate-400 flex justify-between items-center font-mono">
-                  <span>Footer Disclaimer Preview: "{formState.footerTerms}"</span>
-                  <span className="text-emerald-600 font-bold flex items-center gap-1">
-                    <Check size={12} /> Live Synced
-                  </span>
+                {/* Table Preview */}
+                <div className="pt-2">
+                  <table className="w-full text-left border-collapse font-mono text-[10px]">
+                    <thead>
+                      <tr className="border-t border-b border-slate-900 text-slate-800 font-bold">
+                        <th className="py-1">Item Code</th>
+                        <th className="py-1">Item Description</th>
+                        <th className="py-1 text-center">Quantity</th>
+                        <th className="py-1 text-right">Price (Incl)</th>
+                        <th className="py-1 text-right">Tax</th>
+                        <th className="py-1 text-right">Total (Incl)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-slate-900">
+                      <tr>
+                        <td className="py-1">2253</td>
+                        <td className="py-1 font-sans font-semibold">500ML WOOD GLUE</td>
+                        <td className="py-1 text-center">1.00</td>
+                        <td className="py-1 text-right">2.00</td>
+                        <td className="py-1 text-right">0.27</td>
+                        <td className="py-1 text-right font-bold">2.00</td>
+                      </tr>
+                      <tr>
+                        <td className="py-1">2885</td>
+                        <td className="py-1 font-sans font-semibold">BLACK SPRAY PAINT</td>
+                        <td className="py-1 text-center">3.00</td>
+                        <td className="py-1 text-right">2.00</td>
+                        <td className="py-1 text-right">0.81</td>
+                        <td className="py-1 text-right font-bold">6.00</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
+
+                {/* Bottom Footer Band */}
+                <div className="pt-2 border-t border-slate-300 flex justify-between items-center font-mono text-[11px] font-bold">
+                  <span className="text-slate-600 uppercase">{formState.footerTerms || "PRICES QUOTED IN"}</span>
+                  <span className="text-slate-950 font-black text-xs">{formState.currency || "USD"} DOLLAR 15.00</span>
+                </div>
+
               </div>
             </div>
 

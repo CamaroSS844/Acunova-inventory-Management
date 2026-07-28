@@ -23,11 +23,13 @@ import {
   CheckSquare,
   Barcode,
   Camera,
-  Wand2
+  Wand2,
+  ScanLine
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { BarcodeScannerModal } from "../components/BarcodeScannerModal";
 import { SkuGeneratorModal } from "../components/SkuGeneratorModal";
+import { DocumentOcrModal } from "../components/DocumentOcrModal";
 
 const productSchema = z.object({
   name: z.string().min(3, { message: "Product Name must be at least 3 characters." }),
@@ -158,6 +160,7 @@ export const Products: React.FC = () => {
 
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [isSkuGeneratorOpen, setIsSkuGeneratorOpen] = useState(false);
+  const [isDocumentOcrOpen, setIsDocumentOcrOpen] = useState(false);
 
   const handleOpenAddForm = () => {
     setEditingProduct(null);
@@ -275,6 +278,16 @@ export const Products: React.FC = () => {
         </div>
         
         <div className="flex items-center gap-2.5 self-start sm:self-center">
+          <button
+            type="button"
+            onClick={() => setIsDocumentOcrOpen(true)}
+            id="btn-scan-document-products"
+            className="flex items-center gap-2 px-3.5 py-2.5 bg-blue-50 border border-blue-200 hover:bg-blue-100 text-blue-700 text-sm font-bold rounded-xl shadow-xs transition-all"
+          >
+            <ScanLine size={16} className="text-blue-600" />
+            <span>Scan Document Photo</span>
+          </button>
+
           <button
             type="button"
             onClick={() => setIsSkuGeneratorOpen(true)}
@@ -1042,6 +1055,12 @@ export const Products: React.FC = () => {
           }, 50);
           showToast(`Applied generated SKU '${generatedSku}' to product form!`, "success");
         }}
+      />
+
+      {/* Automated Document OCR Extractor Modal */}
+      <DocumentOcrModal
+        isOpen={isDocumentOcrOpen}
+        onClose={() => setIsDocumentOcrOpen(false)}
       />
 
     </div>

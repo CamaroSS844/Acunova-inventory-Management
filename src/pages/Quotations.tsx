@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,10 +25,13 @@ import {
   Calendar,
   AlertCircle,
   FileCheck2,
-  FileHeart
+  FileHeart,
+  ScanLine
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { PdfPreviewModal } from "../components/PdfPreviewModal";
+import { DocumentOcrModal } from "../components/DocumentOcrModal";
+import { PrintConfirmationModal } from "../components/PrintConfirmationModal";
 
 // Form validation schema
 const quotationFormSchema = z.object({
@@ -51,6 +55,7 @@ export const Quotations: React.FC = () => {
 
   const [view, setView] = useState<"list" | "create" | "view">("list");
   const [selectedQuoteId, setSelectedQuoteId] = useState<string | null>(null);
+  const [isOcrModalOpen, setIsOcrModalOpen] = useState(false);
   
   // AI assist state
   const [isGeneratingAiCover, setIsGeneratingAiCover] = useState(false);
@@ -60,6 +65,10 @@ export const Quotations: React.FC = () => {
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [pdfPreviewData, setPdfPreviewData] = useState<{ type: "quotation" | "receipt"; data: Quotation; aiCoverNote?: string | null } | null>(null);
 
+  // Direct Print Verification Modal State
+  const [isDirectPrintConfirmOpen, setIsDirectPrintConfirmOpen] = useState(false);
+  const [directPrintData, setDirectPrintData] = useState<{ type: "quotation"; data: Quotation } | null>(null);
+
   const openPdfPreviewModal = (quote: Quotation) => {
     setPdfPreviewData({
       type: "quotation",
@@ -67,6 +76,11 @@ export const Quotations: React.FC = () => {
       aiCoverNote: quote.id === selectedQuoteId ? aiCoverLetter : null,
     });
     setIsPreviewModalOpen(true);
+  };
+
+  const handleOpenDirectPrint = (quote: Quotation) => {
+    setDirectPrintData({ type: "quotation", data: quote });
+    setIsDirectPrintConfirmOpen(true);
   };
 
   // Queries
@@ -150,8 +164,26 @@ export const Quotations: React.FC = () => {
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "items",
+    name: "items"
   });
+
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.importFromOcr && Array.isArray(location.state.items)) {
+      setView("create");
+      const ocrItems = location.state.items;
+      const formatted = ocrItems.map((item: any) => ({
+        productId: item.productId || (products[0]?.id || ""),
+        quantity: item.quantity || 1
+      }));
+      setValue("items", formatted.length > 0 ? formatted : [{ productId: "", quantity: 1 }]);
+      if (location.state.vendorOrCustomer) {
+        setValue("notes", `Imported from OCR document photo for: ${location.state.vendorOrCustomer}`);
+      }
+      showToast(`Loaded ${formatted.length} OCR extracted line items into quotation!`, "success");
+    }
+  }, [location.state, products]);
 
   const formItems = watch("items");
   const formDiscountRate = watch("discountRate") || 0;
@@ -163,6 +195,33 @@ export const Quotations: React.FC = () => {
     queryFn: () => quotationService.calculate({ items: formItems, discountRate: formDiscountRate }),
     enabled: formItems.length > 0 && formItems.every(i => i.productId && i.quantity > 0),
   });
+
+  const handleOpenDraftPrint = () => {
+    if (!calculationPreview) {
+      showToast("Please select line items and valid quantities to initiate pricing calculators.", "info");
+      return;
+    }
+    const cust = customers.find(c => c.id === formCustomerId);
+    const draftQuote: Quotation = {
+      id: "DRAFT-TEMP",
+      quotationNumber: `QT-DRAFT-${Date.now().toString().slice(-4)}`,
+      customerId: formCustomerId || "CUST-DRAFT",
+      customerName: cust?.name || "Draft Trade Partner",
+      customerEmail: cust?.email || "billing@client.com",
+      date: new Date().toISOString().split("T")[0],
+      expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+      status: "Draft",
+      lines: calculationPreview.lines || [],
+      subtotal: calculationPreview.subtotal || 0,
+      taxRate: 0.15,
+      discountRate: formDiscountRate,
+      discountAmount: calculationPreview.discountAmount || 0,
+      taxAmount: calculationPreview.taxAmount || 0,
+      total: calculationPreview.total || 0,
+      notes: watch("notes") || "Draft quotation specification"
+    };
+    handleOpenDirectPrint(draftQuote);
+  };
 
   const selectedQuote = quotations.find(q => q.id === selectedQuoteId);
 
@@ -225,14 +284,25 @@ export const Quotations: React.FC = () => {
                 Draft new quotations, execute calculations on the backend, and trace multi-company proposals.
               </p>
             </div>
-            <button
-              onClick={() => { setView("create"); }}
-              id="btn-new-quote"
-              className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-md cursor-pointer transition-all"
-            >
-              <Plus size={16} />
-              <span>Draft Quotation</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsOcrModalOpen(true)}
+                id="btn-import-ocr-quotation"
+                className="flex items-center gap-2 px-3.5 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm font-bold rounded-xl border border-blue-200 transition-all shadow-2xs"
+              >
+                <ScanLine size={16} className="text-blue-600" />
+                <span>Import from Document Image</span>
+              </button>
+
+              <button
+                onClick={() => { setView("create"); }}
+                id="btn-new-quote"
+                className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-md cursor-pointer transition-all"
+              >
+                <Plus size={16} />
+                <span>Draft Quotation</span>
+              </button>
+            </div>
           </div>
 
           <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
@@ -518,8 +588,18 @@ export const Quotations: React.FC = () => {
                   </button>
                   <button
                     type="button"
+                    onClick={handleOpenDraftPrint}
+                    disabled={!calculationPreview}
+                    id="btn-verify-print-builder"
+                    className="w-full py-2 bg-slate-800 hover:bg-slate-700/90 disabled:opacity-40 text-xs text-slate-200 font-bold rounded-xl transition-all border border-slate-700/80 flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <Printer size={13} />
+                    <span>Verify & Print Draft</span>
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => setView("list")}
-                    className="w-full py-2.5 bg-slate-800 hover:bg-slate-700/80 text-xs text-slate-300 font-bold rounded-xl transition-all border border-slate-700/50"
+                    className="w-full py-2 bg-slate-800/60 hover:bg-slate-700/60 text-xs text-slate-400 font-bold rounded-xl transition-all border border-slate-800"
                   >
                     Cancel Draft
                   </button>
@@ -544,6 +624,15 @@ export const Quotations: React.FC = () => {
             </button>
 
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => handleOpenDirectPrint(selectedQuote)}
+                id="btn-direct-verify-print"
+                className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                title="Verify proposal details before printing"
+              >
+                <Printer size={14} />
+                <span>Verify & Print</span>
+              </button>
               <button
                 onClick={() => downloadSimulatedPdf(selectedQuote)}
                 className="px-3 py-1.5 border border-slate-200 bg-white rounded-lg text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-all hover:bg-slate-50 cursor-pointer"
@@ -764,6 +853,20 @@ export const Quotations: React.FC = () => {
         onClose={() => setIsPreviewModalOpen(false)}
         document={pdfPreviewData}
         onDownload={() => pdfPreviewData?.data && downloadSimulatedPdf(pdfPreviewData.data)}
+      />
+
+      {/* 5. DOCUMENT OCR MODAL */}
+      <DocumentOcrModal
+        isOpen={isOcrModalOpen}
+        onClose={() => setIsOcrModalOpen(false)}
+      />
+
+      {/* 6. DIRECT PRINT CONFIRMATION MODAL */}
+      <PrintConfirmationModal
+        isOpen={isDirectPrintConfirmOpen}
+        onClose={() => setIsDirectPrintConfirmOpen(false)}
+        onConfirmPrint={() => setTimeout(() => window.print(), 150)}
+        documentData={directPrintData}
       />
 
     </div>

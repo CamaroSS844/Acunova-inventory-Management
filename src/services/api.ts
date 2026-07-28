@@ -17,7 +17,8 @@ import {
   InventoryInsightsResponse,
   DetailedProductView,
   SystemLog,
-  SystemLogsResponse
+  SystemLogsResponse,
+  DocumentAnalysisResult
 } from "../types";
 
 // Fallback relative path allows the Vite server proxying to handle same-origin seamlessly
@@ -241,6 +242,17 @@ export const systemLogService = {
   },
   logAction: async (logData: Omit<SystemLog, "id" | "timestamp">): Promise<SystemLog> => {
     const response = await api.post<SystemLog>("/system-logs", logData);
+    return response.data;
+  }
+};
+
+export const documentOcrService = {
+  analyzeDocumentImage: async (imageBase64: string, mimeType?: string): Promise<DocumentAnalysisResult> => {
+    const response = await api.post<DocumentAnalysisResult>("/gemini/analyze-document", { imageBase64, mimeType });
+    return response.data;
+  },
+  bulkRestockFromOcr: async (items: Array<{ productId?: string; productName: string; sku?: string; quantityToAdd: number; costPrice?: number; sellingPrice?: number }>, note?: string) => {
+    const response = await api.post<{ success: boolean; updatedCount: number; createdCount: number; message: string }>("/inventory/bulk-restock", { items, note });
     return response.data;
   }
 };

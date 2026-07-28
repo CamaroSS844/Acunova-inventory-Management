@@ -23,9 +23,11 @@ import {
   ChevronDown,
   Layers,
   MapPin,
-  TrendingDown
+  TrendingDown,
+  ScanLine
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { DocumentOcrModal } from "../components/DocumentOcrModal";
 
 export const Dashboard: React.FC = () => {
   const queryClient = useQueryClient();
@@ -33,6 +35,7 @@ export const Dashboard: React.FC = () => {
 
   const [thresholdMultiplier, setThresholdMultiplier] = useState<number>(1.0);
   const [severityFilter, setSeverityFilter] = useState<string>("ALL");
+  const [isOcrModalOpen, setIsOcrModalOpen] = useState(false);
   const [restockModalItem, setRestockModalItem] = useState<StockAlertItem | null>(null);
   const [customAddQty, setCustomAddQty] = useState<number>(10);
   const [customMinStock, setCustomMinStock] = useState<number>(5);
@@ -250,6 +253,15 @@ export const Dashboard: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2 self-start sm:self-center">
+          <button
+            onClick={() => setIsOcrModalOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition-all"
+            id="btn-dash-ocr-modal"
+          >
+            <ScanLine size={14} />
+            <span>Scan Document / Invoice Photo</span>
+          </button>
+
           <button
             onClick={() => refetchAlerts()}
             disabled={isAlertsRefetching}
@@ -827,6 +839,12 @@ export const Dashboard: React.FC = () => {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Document OCR Extractor Modal */}
+      <DocumentOcrModal
+        isOpen={isOcrModalOpen}
+        onClose={() => setIsOcrModalOpen(false)}
+      />
 
     </div>
   );

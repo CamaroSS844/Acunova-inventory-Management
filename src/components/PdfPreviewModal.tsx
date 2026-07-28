@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Quotation, Receipt } from "../types";
 import { settingsService } from "../services/api";
+import { PrintConfirmationModal } from "./PrintConfirmationModal";
 
 interface PdfPreviewModalProps {
   isOpen: boolean;
@@ -36,6 +37,7 @@ export const PdfPreviewModal: React.FC<PdfPreviewModalProps> = ({
   onDownload
 }) => {
   const [zoom, setZoom] = useState<number>(100);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState<boolean>(false);
 
   const { data: settings } = useQuery({
     queryKey: ["company-settings"],
@@ -44,18 +46,28 @@ export const PdfPreviewModal: React.FC<PdfPreviewModalProps> = ({
 
   if (!isOpen || !document) return null;
 
-  const companyName = settings?.companyName || "VoltSync Systems";
-  const companySubtitle = settings?.companySubtitle || "Electronics Ltd";
-  const tagline = settings?.tagline || "Authorized Corporate Distribution";
+  const companyName = settings?.companyName || "SHIELD HARDWARE";
+  const companySubtitle = settings?.companySubtitle || "SHIELD HARDWARE";
+  const tagline = settings?.tagline || "Suppliers of Plumbing, Electrical & General Hardware";
   const logoUrl = settings?.logoUrl;
-  const logoInitials = settings?.logoInitials || "VS";
-  const address = settings?.address || "900 Technology Way, Suite 101, Palo Alto, CA 94301";
-  const email = settings?.email || "billing@voltsync-electronics.com";
-  const phone = settings?.phone || "+1-800-555-8800";
-  const vatNumber = settings?.vatNumber || "US-9938201-VS";
-  const registrationNumber = settings?.registrationNumber || "VOLT-2026-CA";
-  const headerColor = settings?.pdfHeaderColor || "#2563eb";
-  const footerTerms = settings?.footerTerms || "Computer generated PDF document. All hardware items include standard 1-year VoltSync enterprise warranty.";
+  const logoInitials = settings?.logoInitials || "SH";
+  const streetAddress = settings?.streetAddress || "NO. 57 FORT STREET";
+  const city = settings?.city || "BULAWAYO";
+  const country = settings?.country || "ZIMBABWE";
+  const email = settings?.email || "shieldhardware57@gmail.com";
+  const tel = settings?.tel || "0";
+  const mobile = settings?.mobile || settings?.phone || "+263 773 360 800";
+  const mobile2 = settings?.mobile2 || "+263 715 503 400";
+  const vatNumber = settings?.vatNumber || "220412593";
+  const tinNumber = settings?.tinNumber || settings?.registrationNumber || "2001804582";
+  const bankName = settings?.bankName || "Stanbic Bank Bulawayo";
+  const accountName = settings?.accountName || "Shield Hardware Pvt Ltd";
+  const accountNumber = settings?.accountNumber || "9140001827461";
+  const ecocashNumber = settings?.ecocashNumber || "*151*2*2*123456# / +263 773 360 800";
+  const currency = settings?.currency || "USD";
+  const salesType = settings?.salesType || "ALL";
+  const doneBy = settings?.doneBy || "LMAKONO";
+  const footerTerms = settings?.footerTerms || "PRICES QUOTED IN USD DOLLAR. Official computer generated document.";
 
   const isQuotation = document.type === "quotation";
   const quoteData = isQuotation ? (document.data as Quotation) : null;
@@ -71,10 +83,16 @@ export const PdfPreviewModal: React.FC<PdfPreviewModalProps> = ({
   const discountAmount = document.data.discountAmount || 0;
   const total = document.data.total || 0;
 
-  const fileName = `VoltSync_${isQuotation ? "Quotation" : "Receipt"}_${docNumber}.pdf`;
+  const fileName = `${companyName.replace(/\s+/g, '_')}_${isQuotation ? "Quotation" : "Receipt"}_${docNumber}.pdf`;
 
   const handlePrint = () => {
-    window.print();
+    setIsConfirmDialogOpen(true);
+  };
+
+  const handleExecutePrint = () => {
+    setTimeout(() => {
+      window.print();
+    }, 150);
   };
 
   const handleZoomIn = () => setZoom((prev) => Math.min(prev + 15, 150));
@@ -169,195 +187,222 @@ export const PdfPreviewModal: React.FC<PdfPreviewModalProps> = ({
         <div 
           id="pdf-document-printable-area"
           style={{ transform: `scale(${zoom / 100})`, transformOrigin: "top center" }}
-          className="bg-white text-slate-900 rounded-none sm:rounded-2xl shadow-2xl border border-slate-200/80 w-full max-w-[800px] p-8 sm:p-12 space-y-8 transition-transform duration-150 relative overflow-hidden print:shadow-none print:border-none print:max-w-none print:w-full print:p-0 print:m-0 print:rounded-none"
+          className="bg-white text-slate-900 rounded-none sm:rounded-2xl shadow-2xl border border-slate-200/80 w-full max-w-[800px] p-6 sm:p-10 space-y-5 transition-transform duration-150 relative overflow-hidden print:shadow-none print:border-none print:max-w-none print:w-full print:p-0 print:m-0 print:rounded-none font-sans"
         >
-          {/* Decorative Watermark Stamp for Verification */}
-          <div className="absolute right-8 top-12 opacity-[0.04] pointer-events-none select-none font-black text-7xl font-mono uppercase tracking-tighter text-slate-900">
-            {isQuotation ? "QUOTATION" : "PAID RECEIPT"}
+          {/* Top Title Bar */}
+          <div className="text-center space-y-1 pb-1">
+            <h1 className="font-extrabold text-2xl text-slate-950 uppercase tracking-wide">
+              {companyName}
+            </h1>
+            <div className="w-full border-b border-slate-900" />
+            <p className="font-bold text-xs text-slate-800 uppercase tracking-tight">
+              {companySubtitle || companyName}
+            </p>
           </div>
 
-          {/* Letterhead Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start gap-6 pb-6 border-b-2 border-slate-900">
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                {logoUrl ? (
-                  <img
-                    src={logoUrl}
-                    alt="Company Logo"
-                    className="max-h-12 max-w-[180px] object-contain rounded-lg border border-slate-200 p-1"
-                  />
-                ) : (
-                  <span
-                    style={{ backgroundColor: headerColor }}
-                    className="p-2.5 rounded-xl text-white font-black text-base leading-none shadow-sm font-mono shrink-0"
-                  >
-                    {logoInitials}
-                  </span>
-                )}
-                <div>
-                  <h1 className="font-extrabold text-2xl text-slate-950 tracking-tight leading-none">
-                    {companyName} {companySubtitle && <span className="font-light text-slate-500 text-xs font-sans">{companySubtitle}</span>}
-                  </h1>
-                  {tagline && (
-                    <span 
-                      style={{ color: headerColor }}
-                      className="text-[10px] font-mono tracking-widest uppercase font-bold block mt-1"
-                    >
-                      {tagline}
-                    </span>
-                  )}
+          {/* Header Grid: Left (Logo & Address) | Right (Phone, Tax IDs) */}
+          <div className="grid grid-cols-2 gap-4 text-xs font-mono">
+            {/* Left Column */}
+            <div className="space-y-2">
+              {logoUrl ? (
+                <img src={logoUrl} alt="Company Logo" className="h-10 object-contain" />
+              ) : (
+                <div className="inline-block px-3 py-1 bg-blue-900 text-white font-black rounded-xs text-xs">
+                  {logoInitials}
+                </div>
+              )}
+              <div className="space-y-0.5 text-slate-800 uppercase font-bold text-[11px] leading-snug">
+                <p>{streetAddress}</p>
+                <p>{city}</p>
+                <p>{country}</p>
+                <p className="normal-case pt-1 text-slate-700 font-semibold"><span className="font-mono text-slate-500 font-bold">Email:</span> {email}</p>
+              </div>
+            </div>
+
+            {/* Right Column */}
+            <div className="text-right space-y-1 text-slate-800 text-[11px]">
+              <div className="flex justify-end gap-2">
+                <span className="text-slate-500 font-bold font-mono">Tel:</span>
+                <span className="font-mono">{tel}</span>
+              </div>
+              <div className="flex justify-end gap-2">
+                <span className="text-slate-500 font-bold font-mono">Mobile:</span>
+                <div className="text-right font-mono">
+                  <p>{mobile}</p>
+                  {mobile2 && <p>{mobile2}</p>}
                 </div>
               </div>
-              <div className="text-xs text-slate-500 space-y-0.5 font-sans leading-relaxed">
-                {address && <p className="flex items-center gap-1.5"><Building2 size={12} className="text-slate-400 shrink-0" /> {address}</p>}
-                {(email || phone) && (
-                  <p className="flex items-center gap-1.5 flex-wrap">
-                    {email && <span className="flex items-center gap-1"><Mail size={12} className="text-slate-400" /> {email}</span>}
-                    {email && phone && <span className="text-slate-300">|</span>}
-                    {phone && <span className="flex items-center gap-1"><Phone size={12} className="text-slate-400" /> {phone}</span>}
-                  </p>
-                )}
-                {(vatNumber || registrationNumber) && (
-                  <p className="font-mono text-[11px] text-slate-400 pt-0.5">
-                    {vatNumber && <span>VAT Reg No: {vatNumber}</span>}
-                    {vatNumber && registrationNumber && <span> | </span>}
-                    {registrationNumber && <span>Registration: {registrationNumber}</span>}
-                  </p>
-                )}
+              <div className="flex justify-end gap-2 pt-1">
+                <span className="text-slate-500 font-bold font-mono">VAT No:</span>
+                <span className="font-mono font-bold">{vatNumber}</span>
               </div>
-            </div>
-
-            <div className="text-left sm:text-right space-y-1 self-stretch sm:self-auto bg-slate-50 sm:bg-transparent p-4 sm:p-0 rounded-xl border border-slate-100 sm:border-0">
-              <span className="text-[10px] uppercase font-mono font-bold tracking-widest text-slate-400 block">
-                {isQuotation ? "OFFICIAL SALES QUOTATION" : "OFFICIAL CASH RECEIPT"}
-              </span>
-              <h2 className="text-2xl font-black font-mono text-slate-950">{docNumber}</h2>
-              <div className="text-xs text-slate-500 font-mono space-y-1 pt-1">
-                <p className="flex items-center sm:justify-end gap-1.5"><Calendar size={12} /> Issued Date: <strong className="text-slate-800">{date}</strong></p>
-                {isQuotation && quoteData?.expiryDate && (
-                  <p className="text-rose-600 font-semibold">Valid Until: {quoteData.expiryDate}</p>
-                )}
-                {!isQuotation && (
-                  <p className="text-emerald-600 font-semibold flex items-center sm:justify-end gap-1">
-                    <CheckCircle2 size={12} /> Payment Status: SETTLED IN FULL
-                  </p>
-                )}
+              <div className="flex justify-end gap-2">
+                <span className="text-slate-500 font-bold font-mono">TIN No:</span>
+                <span className="font-mono font-bold">{tinNumber}</span>
               </div>
             </div>
           </div>
 
-          {/* Customer & Document Context Section */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-slate-50 p-5 rounded-xl border border-slate-200/80">
-            <div className="space-y-1">
-              <span className="text-[10px] font-mono font-bold text-slate-400 tracking-wider uppercase block">Billed / Issued To:</span>
-              <p className="font-extrabold text-base text-slate-900">{customerName}</p>
-              <p className="text-xs text-slate-500 font-mono">{customerEmail}</p>
-            </div>
-            <div className="space-y-1 sm:text-right">
-              <span className="text-[10px] font-mono font-bold text-slate-400 tracking-wider uppercase block">Corporate Terms:</span>
-              <p className="text-xs font-semibold text-slate-800">Account: VoltSync Silicon Valley Logistics</p>
-              <p className="text-xs text-slate-500 font-mono">
-                {isQuotation ? "Standard 30-Day Rate Guarantee" : "Immediate Receipt Authorization #PAID-2026"}
+          {/* Tagline Slogan Line */}
+          {tagline && (
+            <div className="text-center">
+              <p className="text-xs font-serif italic text-slate-800 border-t border-b border-slate-300 py-1 font-medium">
+                {tagline}
               </p>
             </div>
+          )}
+
+          {/* Centered Document Type Banner */}
+          <div className="text-center pt-1">
+            <h2 className="text-base font-extrabold tracking-widest uppercase text-slate-950 font-mono">
+              {isQuotation ? "QUOTATION" : "RECEIPT"}
+            </h2>
           </div>
 
-          {/* AI Pitch/Cover Note (If available for Quotations) */}
-          {document.aiCoverNote && (
-            <div className="bg-purple-50/60 border border-purple-200/80 p-4 rounded-xl space-y-1.5">
-              <div className="flex items-center gap-1.5 text-purple-900 font-bold text-xs">
-                <Sparkles size={14} className="text-purple-600" />
-                <span>VoltSync Executive Summary Note</span>
+          {/* Side-by-Side Customer & Quotation Detail Boxes */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            {/* Customer Box */}
+            <div className="border border-amber-900/40 rounded-xl p-3.5 space-y-1 font-mono text-xs text-slate-900 bg-amber-50/10">
+              <div className="flex gap-2">
+                <span className="text-slate-500 font-bold w-20">Customer:</span>
+                <span className="font-extrabold text-slate-950">{customerName}</span>
               </div>
-              <p className="text-xs text-purple-950 leading-relaxed italic font-serif">
+              <div className="flex gap-2">
+                <span className="text-slate-500 font-bold w-20">Mobile:</span>
+                <span>{customerEmail || "N/A"}</span>
+              </div>
+              <div className="flex gap-2">
+                <span className="text-slate-500 font-bold w-20">VAT No:</span>
+                <span>-</span>
+              </div>
+            </div>
+
+            {/* Document Metadata Box */}
+            <div className="space-y-2">
+              <div className="border border-amber-900/40 rounded-xl p-3.5 space-y-1 font-mono text-xs text-slate-900 bg-amber-50/10">
+                <div className="flex justify-between">
+                  <span className="text-slate-500 font-bold">{isQuotation ? "Quotation No:" : "Receipt No:"}</span>
+                  <span className="font-extrabold text-slate-950">{docNumber}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500 font-bold">Date:</span>
+                  <span>{date}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500 font-bold">Sales Type:</span>
+                  <span>{salesType}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500 font-bold">Done By:</span>
+                  <span className="font-bold">{doneBy}</span>
+                </div>
+              </div>
+
+              <div className="border border-amber-900/40 rounded-lg p-2 px-4 flex justify-between font-mono text-xs font-bold text-slate-950 bg-amber-50/20">
+                <span>Currency:</span>
+                <span className="text-blue-900">{currency}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* AI Cover Note if available */}
+          {document.aiCoverNote && (
+            <div className="bg-blue-50/60 border border-blue-200 p-3 rounded-xl space-y-1">
+              <div className="flex items-center gap-1.5 text-blue-900 font-bold text-xs">
+                <Sparkles size={14} className="text-blue-600" />
+                <span>Executive Summary / Context</span>
+              </div>
+              <p className="text-xs text-slate-800 italic font-serif leading-relaxed">
                 "{document.aiCoverNote}"
               </p>
             </div>
           )}
 
-          {/* Itemized Line Items Table */}
-          <div className="space-y-3">
-            <span className="text-[11px] font-mono font-bold text-slate-400 tracking-wider uppercase block">
-              Itemized Line Items
-            </span>
-            <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="bg-slate-100/80 text-slate-700 font-bold uppercase font-mono tracking-wider border-b border-slate-200">
-                    <th className="py-3 px-4">#</th>
-                    <th className="py-3 px-4">Item Description</th>
-                    <th className="py-3 px-4 text-center">Qty</th>
-                    <th className="py-3 px-4 text-right">Unit Price</th>
-                    <th className="py-3 px-4 text-right">Total Price</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 font-mono text-slate-800">
-                  {lines.map((line, index) => (
-                    <tr key={index} className="hover:bg-slate-50/50">
-                      <td className="py-3 px-4 text-slate-400 text-[11px] font-mono">{index + 1}</td>
-                      <td className="py-3 px-4 font-sans font-semibold text-slate-900">{line.productName}</td>
-                      <td className="py-3 px-4 text-center font-bold text-slate-800">{line.quantity}</td>
-                      <td className="py-3 px-4 text-right">${line.unitPrice.toFixed(2)}</td>
-                      <td className="py-3 px-4 text-right font-bold text-slate-950">${line.totalPrice.toFixed(2)}</td>
+          {/* Line Items Table */}
+          <div className="pt-2">
+            <table className="w-full text-left border-collapse font-mono text-xs">
+              <thead>
+                <tr className="border-t-2 border-b-2 border-slate-900 text-slate-900 font-extrabold">
+                  <th className="py-2 pr-2">Item Code</th>
+                  <th className="py-2 px-2">Item Description</th>
+                  <th className="py-2 px-2 text-center">Quantity</th>
+                  <th className="py-2 px-2 text-right">Price (Incl)</th>
+                  <th className="py-2 px-2 text-right">Tax</th>
+                  <th className="py-2 pl-2 text-right">Total (Incl)</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 text-slate-900">
+                {lines.map((line, index) => {
+                  const lineTax = line.totalPrice * 0.15;
+                  const itemCode = `ITEM-${1000 + index}`;
+                  return (
+                    <tr key={index} className="hover:bg-slate-50">
+                      <td className="py-2 pr-2 text-slate-500 font-mono text-[11px]">{itemCode}</td>
+                      <td className="py-2 px-2 font-sans font-bold text-slate-900 uppercase text-[11px]">
+                        {line.productName}
+                      </td>
+                      <td className="py-2 px-2 text-center font-bold">{line.quantity.toFixed(2)}</td>
+                      <td className="py-2 px-2 text-right">{line.unitPrice.toFixed(2)}</td>
+                      <td className="py-2 px-2 text-right text-slate-600">{lineTax.toFixed(2)}</td>
+                      <td className="py-2 pl-2 text-right font-bold text-slate-950">
+                        {line.totalPrice.toFixed(2)}
+                      </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
 
-          {/* Financial Breakdown Totals Box */}
-          <div className="flex flex-col sm:flex-row justify-between items-start gap-6 pt-4 border-t border-slate-200">
-            <div className="text-xs text-slate-500 max-w-xs space-y-2">
-              <div className="flex items-center gap-1.5 text-slate-700 font-bold text-xs">
-                <ShieldCheck size={14} className="text-blue-600" />
-                <span>Verification & Security</span>
-              </div>
-              <p className="text-[11px] leading-relaxed">
-                This PDF document carries official corporate authorization. All hardware items include standard 1-year VoltSync enterprise warranty.
-              </p>
+          {/* Subtotals & Banking / Payment Footer Details */}
+          <div className="pt-4 border-t-2 border-slate-900 space-y-4 font-mono text-xs">
+            
+            {/* Totals Summary */}
+            <div className="flex justify-between items-center text-slate-900 font-extrabold text-sm bg-slate-50 p-3 rounded-lg border border-slate-200">
+              <span className="uppercase tracking-wide">{footerTerms}</span>
+              <span className="text-base text-blue-900">{currency} {total.toFixed(2)}</span>
             </div>
 
-            <div className="w-full sm:w-64 bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-2 font-mono text-xs">
-              <div className="flex justify-between text-slate-600">
-                <span>Subtotal:</span>
-                <span className="font-semibold">${subtotal.toFixed(2)}</span>
+            {/* Payment & Settlement Details Box */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 text-[11px] text-slate-800 border-t border-slate-200">
+              <div className="space-y-1">
+                <p className="font-bold text-slate-900 uppercase text-xs flex items-center gap-1">
+                  <Building2 size={13} className="text-blue-700" /> Bank Settlement Details
+                </p>
+                <p><span className="text-slate-500 font-bold">Bank:</span> {bankName}</p>
+                <p><span className="text-slate-500 font-bold">Account Name:</span> {accountName}</p>
+                <p><span className="text-slate-500 font-bold">Account No:</span> <strong className="text-slate-900 font-mono">{accountNumber}</strong></p>
               </div>
 
-              {discountAmount > 0 && (
-                <div className="flex justify-between text-emerald-600 font-semibold">
-                  <span>Corporate Discount:</span>
-                  <span>-${discountAmount.toFixed(2)}</span>
-                </div>
-              )}
-
-              <div className="flex justify-between text-slate-600">
-                <span>Estimated Tax (15%):</span>
-                <span className="font-semibold">${taxAmount.toFixed(2)}</span>
-              </div>
-
-              <div className="pt-2 border-t border-slate-300 flex justify-between items-baseline text-slate-950">
-                <span className="font-extrabold text-sm uppercase">Total Due:</span>
-                <span className="font-black text-lg text-blue-600">${total.toFixed(2)}</span>
+              <div className="space-y-1 sm:text-right">
+                <p className="font-bold text-slate-900 uppercase text-xs flex items-center sm:justify-end gap-1">
+                  EcoCash Mobile Merchant
+                </p>
+                <p><span className="text-slate-500 font-bold">Merchant / USSD Code:</span></p>
+                <p className="font-bold font-mono text-slate-950 text-xs bg-slate-100 px-2 py-0.5 rounded inline-block">
+                  {ecocashNumber}
+                </p>
               </div>
             </div>
-          </div>
 
-          {/* Signatures & Footer Note */}
-          <div className="pt-8 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-end gap-6 text-xs text-slate-400">
-            <div className="space-y-1 max-w-md">
-              <p className="font-semibold text-slate-700">{companyName} - Official Document</p>
-              <p className="text-[10px] leading-relaxed">{footerTerms}</p>
+            {/* Official Computer Generated Disclaimer */}
+            <div className="text-center pt-2 text-[10px] text-slate-400 uppercase font-mono">
+              *** Official Computer Generated Document. Valid Without Physical Stamp ***
             </div>
 
-            <div className="text-center sm:text-right space-y-1 shrink-0">
-              <div className="h-8 border-b border-slate-300 w-48 mb-1" />
-              <p className="font-bold text-slate-800 text-[11px]">Authorized Signature / Stamp</p>
-            </div>
           </div>
 
         </div>
       </div>
+
+      {/* Verification Dialog before triggering browser print */}
+      <PrintConfirmationModal
+        isOpen={isConfirmDialogOpen}
+        onClose={() => setIsConfirmDialogOpen(false)}
+        onConfirmPrint={handleExecutePrint}
+        documentData={document}
+      />
     </div>
   );
 };

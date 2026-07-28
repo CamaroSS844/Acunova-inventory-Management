@@ -20,10 +20,12 @@ import {
   Sun,
   ShieldAlert,
   Sparkles,
-  Info
+  Info,
+  ScanLine
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { GlobalSearch } from "./GlobalSearch";
+import { DocumentOcrModal } from "./DocumentOcrModal";
 
 // Light Toast Notification Context for quick feedbacks
 interface Toast {
@@ -49,6 +51,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const location = useLocation();
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isOcrModalOpen, setIsOcrModalOpen] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const showToast = (message: string, type: "success" | "error" | "info") => {
@@ -107,7 +110,18 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             <GlobalSearch />
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setIsOcrModalOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-extrabold text-xs rounded-xl border border-blue-200 transition-all shadow-2xs shrink-0"
+              title="Upload photo or document to extract text with Gemini 3.1 Pro"
+              id="btn-header-ocr-scan"
+            >
+              <ScanLine size={15} className="text-blue-600" />
+              <span className="hidden sm:inline">Scan Document Photo</span>
+            </button>
+
             <div className="hidden md:flex flex-col text-right">
               <span className="text-xs font-semibold text-blue-600 uppercase tracking-widest">{user?.role}</span>
               <span className="text-xs text-slate-500 font-mono">Tenant ID: VOLTSYNC-CORP</span>
@@ -202,6 +216,12 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             {children}
           </main>
         </div>
+
+        {/* Document OCR Extractor Modal */}
+        <DocumentOcrModal
+          isOpen={isOcrModalOpen}
+          onClose={() => setIsOcrModalOpen(false)}
+        />
 
         {/* Toast Canvas Notifications */}
         <div className="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none max-w-sm w-full">
